@@ -1,21 +1,24 @@
-/**
- * This is the main entrypoint to your Probot app
- * @param {import('probot').Probot} app
- */
+const { Probot } = require('probot');
+const axios = require('axios');
+
 module.exports = (app) => {
-  // Your code here
-  app.log.info("Yay, the app was loaded!");
+  app.log.info('Yay, the app was loaded!');
 
-  app.on("issues.opened", async (context) => {
+  app.on('issues.opened', async (context) => {
+    const { owner, repo, number } = context.issue();
+
+    // Make a GET request to the Base URL
+    const response = await axios.get('https://receptive-yellow-thorium.glitch.me');
+
+    // Create a comment on the issue with the data from the Base URL
     const issueComment = context.issue({
-      body: "Thanks for opening this issue!",
+      body: `Thanks for opening this issue!\nThe data from the Base URL is: ${response.data}`,
     });
-    return context.octokit.issues.createComment(issueComment);
+
+    // Post the comment to the issue
+    await context.octokit.issues.createComment(issueComment);
   });
-
-  // For more information on building apps:
-  // https://probot.github.io/docs/
-
-  // To get your app running against GitHub, see:
-  // https://probot.github.io/docs/development/
 };
+
+
+
